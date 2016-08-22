@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Amoji</string>
+    <string name="pref_desc_emoji">将 QQ 默认的 iOS 风格 emoji 替换为 Android 风格 emoji</string>
+    <string name="pref_desc_font">忽略对方设定的自定义字体,强制使用默认字体</string>
+    <string name="pref_desc_group_bubble">在群聊中强制显示默认气泡</string>
+    <string name="pref_desc_private_bubble">在私聊中强制显示默认气泡</string>
+    <string name="pref_desc_restart_qq">重启 QQ 以使设置生效\n注意：设置仅对新消息生效</string>
+    <string name="pref_header_general">一般设置</string>
+    <string name="pref_header_misc">杂项设置</string>
+    <string name="pref_title_about">关于</string>
+    <string name="pref_title_emoji">使用 Android 风格的 emoji</string>
+    <string name="pref_title_font">禁用自定义字体</string>
+    <string name="pref_title_group_bubble">群聊禁用自定义气泡</string>
+    <string name="pref_title_private_bubble">私聊禁用自定义气泡</string>
+    <string name="pref_title_restart_qq">重新启动 QQ</string>
+    <string name="about_text">Amoji，让QQ看起来不那么乱。\n\nHamster Tian, 2016.\n\n源码位于 https://github.com/HamsterReserved/Amoji</string>
+    <string name="restarting_qq">正在重新启动 QQ……</string>
+    <string name="restart_command_failed">QQ 重新启动失败。请检查 root 权限是否正常。</string>
+</resources>

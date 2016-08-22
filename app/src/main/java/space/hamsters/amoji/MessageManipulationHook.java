@@ -5,12 +5,13 @@ import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
 /**
  * Created by hamster on 16/8/21.
- * <p>
+ * <p/>
  * Remove all the useless (sometimes ugly) decorations
  */
 public class MessageManipulationHook {
@@ -78,37 +79,44 @@ public class MessageManipulationHook {
     };
 
     public static void hook(ClassLoader loader) {
-        XposedBridge.log("Amoji hooked on QQ.");
+        XposedBridge.log("Amoji hooked on QQ");
+
+        XSharedPreferences preferences = new XSharedPreferences("space.hamsters.amoji");
 
         findClasses(loader);
+
         /*
          * This method is mapping every character to emoji resource id.
          * -1 if not emoji or not found in emoji list
          */
-        XposedHelpers.findAndHookMethod("com.tencent.mobileqq.text.EmotcationConstants", loader,
-                "a", int.class,
-                sRestoreEmojiHook);
+        if (preferences.getBoolean("replace_emoji", true))
+            XposedHelpers.findAndHookMethod("com.tencent.mobileqq.text.EmotcationConstants", loader,
+                    "a", int.class,
+                    sRestoreEmojiHook);
 
         /*
          * Disable custom bubbles in group chat
          */
-        XposedHelpers.findAndHookMethod("com.tencent.mobileqq.app.message.BaseMessageProcessorForTroopAndDisc", loader,
-                "a", MsgClass, ArrayList.class, PBDecodeContextClass, boolean.class, MessageInfoClass,
-                sRemoveBubbleInGroupHook);
+        if (preferences.getBoolean("disable_bubble_in_group", true))
+            XposedHelpers.findAndHookMethod("com.tencent.mobileqq.app.message.BaseMessageProcessorForTroopAndDisc", loader,
+                    "a", MsgClass, ArrayList.class, PBDecodeContextClass, boolean.class, MessageInfoClass,
+                    sRemoveBubbleInGroupHook);
 
         /*
          * Disable custom bubbles in private chat
          */
-        XposedHelpers.findAndHookMethod("com.tencent.mobileqq.app.message.C2CMessageProcessor", loader,
-                "a", MsgClass, PBDecodeContextClass,
-                sRemoveBubbleInPrivateHook);
+        if (preferences.getBoolean("disable_bubble_in_private", true))
+            XposedHelpers.findAndHookMethod("com.tencent.mobileqq.app.message.C2CMessageProcessor", loader,
+                    "a", MsgClass, PBDecodeContextClass,
+                    sRemoveBubbleInPrivateHook);
 
         /*
          * Disable custom font
          */
-        XposedHelpers.findAndHookMethod("com.etrump.mixlayout.FontManager", loader,
-                "a", ChatMessageClass, ExtensionInfoClass,
-                sRemoveCustomFontHook);
+        if (preferences.getBoolean("disable_custom_font", true))
+            XposedHelpers.findAndHookMethod("com.etrump.mixlayout.FontManager", loader,
+                    "a", ChatMessageClass, ExtensionInfoClass,
+                    sRemoveCustomFontHook);
     }
 
     public static void setField(Class<?> clazz, Object obj, String name, Object value) {

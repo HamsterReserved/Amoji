@@ -23,7 +23,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Use original Android emojis in QQ" />
+            android:value="Use original Android emojis in QQ, remove custom fonts and bubbles" />
         <meta-data
             android:name="xposedminversion"
             android:value="54" />

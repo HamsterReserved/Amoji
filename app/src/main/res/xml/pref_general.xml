@@ -1,5 +1,41 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference android:title="Restart QQ" />
+    <PreferenceCategory android:title="@string/pref_header_general">
+        <SwitchPreference
+            android:title="@string/pref_title_emoji"
+            android:summary="@string/pref_desc_emoji"
+            android:defaultValue="true"
+            android:key="replace_emoji"/>
+
+        <SwitchPreference
+            android:title="@string/pref_title_group_bubble"
+            android:summary="@string/pref_desc_group_bubble"
+            android:defaultValue="true"
+            android:key="disable_bubble_in_group"/>
+
+        <SwitchPreference
+            android:title="@string/pref_title_private_bubble"
+            android:summary="@string/pref_desc_private_bubble"
+            android:defaultValue="true"
+            android:key="disable_bubble_in_private"/>
+
+        <SwitchPreference
+            android:title="@string/pref_title_font"
+            android:summary="@string/pref_desc_font"
+            android:defaultValue="true"
+            android:key="disable_custom_font"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_header_misc">
+        <Preference
+            android:title="@string/pref_title_restart_qq"
+            android:summary="@string/pref_desc_restart_qq"
+            android:key="restart_qq"/>
+        <Preference
+            android:title="@string/pref_title_about"
+            android:summary="@string/pref_desc_about"
+            android:key="about"/>
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

@@ -2,18 +2,22 @@ package space.hamsters.amoji;
 
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.ActionBar;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.widget.Toast;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -27,7 +31,6 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class MainActivity extends AppCompatPreferenceActivity {
-
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
@@ -39,24 +42,11 @@ public class MainActivity extends AppCompatPreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setupActionBar();
-
         Intent launchIntent = getIntent();
         if (launchIntent.getStringArrayExtra(EXTRA_SHOW_FRAGMENT) == null)
             launchIntent.putExtra(EXTRA_SHOW_FRAGMENT, GeneralPreferenceFragment.class.getName());
 
         super.onCreate(savedInstanceState);
-    }
-
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
-    private void setupActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            // Show the Up button in the action bar.
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
     }
 
     /**
@@ -85,6 +75,9 @@ public class MainActivity extends AppCompatPreferenceActivity {
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName);
     }
 
+    /**
+     * For Xposed use
+     */
     @Override
     public SharedPreferences getSharedPreferences(String name, int mode) {
         return super.getSharedPreferences(name, MODE_WORLD_READABLE);
@@ -100,17 +93,60 @@ public class MainActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
-            setHasOptionsMenu(true);
+
+            findPreference("restart_qq").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    restartQQ();
+                    return true;
+                }
+            });
+
+            findPreference("about").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    showAboutDialog();
+                    return true;
+                }
+            });
+
+            findPreference("about").setSummary(String.format(Locale.getDefault(),
+                    getString(R.string.pref_desc_about), BuildConfig.VERSION_NAME));
         }
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), MainActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+
+        private void restartQQ() {
+            final ProgressDialog dialog = new ProgressDialog(getActivity());
+            dialog.setIndeterminate(true);
+            dialog.setMessage(getResources().getString(R.string.restarting_qq));
+
+            RootCommandAsyncTask.CommandCallback callback = new RootCommandAsyncTask.CommandCallback() {
+                @Override
+                public void onSuccess() {
+                    dialog.dismiss();
+
+                    Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.tencent.mobileqq");
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(int returnCode) {
+                    dialog.dismiss();
+                    Toast.makeText(getActivity(), R.string.restart_command_failed, Toast.LENGTH_SHORT).show();
+                }
+            };
+
+            RootCommandAsyncTask task = new RootCommandAsyncTask(callback);
+            task.execute("am force-stop com.tencent.mobileqq");
+            dialog.show();
+        }
+
+        private void showAboutDialog() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(LayoutInflater.from(getActivity()).inflate(R.layout.about_me_dialog, null));
+            builder.setTitle(R.string.app_name);
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.show();
         }
     }
 
